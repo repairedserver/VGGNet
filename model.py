@@ -104,3 +104,38 @@ class vgg(nn.Module):
                     nn.init.constant_(m.bias, 0)
 
 vgg16 = vgg(vgg.make_layers(cfg), 10, True).to(device)
+
+a = torch.Tensor(1, 3, 32, 32).to(device)
+out = vgg16(a)
+print(out)
+
+criterion = nn.CrossEntropyLoss().to(device)
+optimizer = optim.SGD(vgg16.parameters(), lr=0.005, momentum=0.9)
+lr_sche = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.9)
+
+loss_plt = vis.line(Y=torch.Tensor(1).zero_(), opts=dict(title='loss_trakcer', legend=['loss'], showlegend=True))
+print(len(trainloader))
+epochs = 50
+
+for epoch in range(epochs):
+    running_loss = 0.0
+    for i, data in enumerate(trainloader, 0):
+        inputs, labels = data
+        inputs = inputs.to(device)
+        labels = labels.to(device)
+
+        optimizer.zero_grad()
+
+        outputs = vgg16(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+        if i % 30 == 29:
+            loss_tracker(loss_plt, torch.Tensor([running_loss / 30]), torch.Tensor([i + epoch * len(trainloader)]))
+            print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 30))
+            running_loss = 0.0
+    lr_sche.step()
+
+print('학습 완료')
