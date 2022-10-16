@@ -5,6 +5,8 @@ import torchvision
 import torchvision.transforms as transforms
 import visdom
 import torchvision.models.vgg as vgg
+import matplotlib.pyplot as plt
+import numpy as np
 # 모델은 파이토치에서 제공하는 torchvision.models.vgg 함수 사용
 
 vis = visdom.Visdom()
@@ -139,3 +141,26 @@ for epoch in range(epochs):
     lr_sche.step()
 
 print('학습 완료')
+
+def imshow(img):
+    img = img / 2 + 0.5
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.show()
+
+data_iter = iter(testloader)
+images, labels = data_iter.next()
+
+#이미지 출력
+imshow(torchvision.utils.make_grid(images))
+for j in range(4):
+    print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]]))
+
+outputs = vgg16(images.to(device))
+_, predicted = torch.max(outputs, 1)
+
+for j in range(4):
+    print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]))
+    
+correct = 0
+total = 0
