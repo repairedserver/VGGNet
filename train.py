@@ -1,6 +1,5 @@
 import torch
 import torchvision
-<<<<<<< HEAD
 import torchvision.transforms as transforms
 
 #transform과 데이터셋
@@ -16,5 +15,3 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=32, shuffle=True)
 
 testset = torchvision.datasets.STL10(root='./data', split='test', download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=32, shuffle=False)
-=======
->>>>>>> main
