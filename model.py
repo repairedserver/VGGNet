@@ -4,6 +4,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 import visdom
+import torchvision.models.vgg as vgg
 # 모델은 파이토치에서 제공하는 torchvision.models.vgg 함수 사용
 
 vis = visdom.Visdom()
@@ -42,3 +43,25 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 data_iter = iter(trainloader)
 images, labels = data_iter.next()
 vis.images(images / 2 + 0.5)
+
+for i in range(4):
+    print(' '.join('%5s' % classes[labels[i]]))
+
+def make_layers(cfg, batch_norm=False):
+    layers = []
+    in_channels = 3
+
+    for v in cfg:
+        if v == 'M':
+            layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
+        else:
+            conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
+            if batch_norm:
+                layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=True)]
+            else:
+                layers += [conv2d, nn.ReLU(inplace=True)]
+            in_channels = v
+
+    return nn.Sequential(*layers)
+
+cfg = [32, 32, 'M', 64, 64, 128, 128, 128, 'M', 256, 256, 256, 512, 512, 512, 'M']
