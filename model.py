@@ -36,3 +36,9 @@ testset = torchvision.datasets.CIFAR10(root='./cifar10', train=False,
                                        download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=4,
                                          shuffle=False, num_workers=0)
+
+classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+
+data_iter = iter(trainloader)
+images, labels = data_iter.next()
+vis.images(images / 2 + 0.5)
